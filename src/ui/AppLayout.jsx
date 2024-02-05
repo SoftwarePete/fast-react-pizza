@@ -4,8 +4,9 @@ import Header from "./Header";
 import Loader from "./Loader";
 
 function AppLayout() {
-  /*  Get current status of app  */
+  /*  Get current status          */
   /*  submitting / loading / idle */
+  /*  for the whole app           */
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
 

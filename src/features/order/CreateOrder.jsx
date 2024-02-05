@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 
@@ -46,12 +45,16 @@ function CreateOrder() {
 
   return (
     <div>
+      {/* <Form method="POST" action="/order/new">   */}
+      {/* No need to specifi the route in this case  */}
+      {/* router will match closest route            */}
       <Form method="POST">
         <h2>{"Ready to order? Let's go!"}</h2>
         <div>
           <label>First Name</label>
           <input type="text" name="customer" required />
         </div>
+
         <div>
           <label>Phone number</label>
           <div>
@@ -59,12 +62,14 @@ function CreateOrder() {
           </div>
           {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
+
         <div>
           <label>Address</label>
           <div>
             <input type="text" name="address" required />
           </div>
         </div>
+
         <div>
           <input
             type="checkbox"
@@ -76,6 +81,7 @@ function CreateOrder() {
           <label htmlFor="priority">Want to yo give your order priority?</label>
         </div>
         <div>
+          {/* The hidden input will get passed along as to 'action' */}
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <button disabled={isSubmitting}>
             {isSubmitting ? "Placing order..." : "Order now"}
@@ -85,7 +91,9 @@ function CreateOrder() {
     </div>
   );
 }
-// Called when React-Router Form calls onSubmit "method"
+
+/* Called when React-Router Form calls */
+/* onSubmit "method", because of POST  */
 export async function action({ request }) {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
@@ -101,12 +109,14 @@ export async function action({ request }) {
     errors.phone =
       "Please give us your correct phone number\nWe might need it to contact you.";
 
-  const newOrder = await createOrder(order);
-
   if (Object.keys(errors).length > 0) return errors;
 
-  // Can't call useNavigate inside functions, has to be a component
-  // So we use 'redirect' instead
+  /* if we're good, create order */
+  const newOrder = await createOrder(order);
+
+  /* Need to redirect to newOrder page when it's created                */
+  /* But can't call useNavigate inside functions, has to be a component */
+  /* So we use 'redirect' instead                                       */
   return redirect(`/order/${newOrder.id}`);
 }
 
