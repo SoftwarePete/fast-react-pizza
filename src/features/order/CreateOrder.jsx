@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
+import { createOrder } from "../../services/apiRestaurant";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -31,33 +33,38 @@ const fakeCart = [
 ];
 
 function CreateOrder() {
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+
+  const formErrors = useActionData();
+
   // const [withPriority, setWithPriority] = useState(false);
   const cart = fakeCart;
+  ///// No state needed, no loading
+  /// <Form method="POST" action="/order/new">
+  ///// React Router Form calls "action" onSubmit of form
 
   return (
     <div>
-      <h2>{"Ready to order? Let's go!"}</h2>
-
-      <form>
+      <Form method="POST">
+        <h2>{"Ready to order? Let's go!"}</h2>
         <div>
           <label>First Name</label>
           <input type="text" name="customer" required />
         </div>
-
         <div>
           <label>Phone number</label>
           <div>
             <input type="tel" name="phone" required />
           </div>
+          {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
-
         <div>
           <label>Address</label>
           <div>
             <input type="text" name="address" required />
           </div>
         </div>
-
         <div>
           <input
             type="checkbox"
@@ -68,13 +75,39 @@ function CreateOrder() {
           />
           <label htmlFor="priority">Want to yo give your order priority?</label>
         </div>
-
         <div>
-          <button>Order now</button>
+          <input type="hidden" name="cart" value={JSON.stringify(cart)} />
+          <button disabled={isSubmitting}>
+            {isSubmitting ? "Placing order..." : "Order now"}
+          </button>
         </div>
-      </form>
+      </Form>
     </div>
   );
+}
+// Called when React-Router Form calls onSubmit "method"
+export async function action({ request }) {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+
+  const order = {
+    ...data,
+    cart: JSON.parse(data.cart),
+    priority: data.priority === "on",
+  };
+
+  const errors = {};
+  if (!isValidPhone(order.phone))
+    errors.phone =
+      "Please give us your correct phone number\nWe might need it to contact you.";
+
+  const newOrder = await createOrder(order);
+
+  if (Object.keys(errors).length > 0) return errors;
+
+  // Can't call useNavigate inside functions, has to be a component
+  // So we use 'redirect' instead
+  return redirect(`/order/${newOrder.id}`);
 }
 
 export default CreateOrder;
