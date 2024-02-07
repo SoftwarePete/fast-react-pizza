@@ -27,8 +27,8 @@ const router = createBrowserRouter([
       {
         path: "/order/new",
         element: <CreateOrder />,
-        /* Because we've plugged this action into this element -
-        /* Whenever the Order Form gets submitted, this action function gets called */
+        /* "action" will be called every time  */
+        /* <Form method="POST"> is submitted   */
         action: createOrderAction,
       },
       {
