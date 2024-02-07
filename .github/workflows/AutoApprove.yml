@@ -3,7 +3,7 @@ name: PR Approval
 on:
   pull_request:
     branches:
-      - master
+      - maain
     types:
       - opened
 
