@@ -6,6 +6,7 @@ import {
   formatDate,
 } from "../../utils/helpers";
 import OrderItem from "./OrderItem";
+import Button from "../../ui/Button";
 
 function Order() {
   const order = useLoaderData();
